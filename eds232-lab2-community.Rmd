@@ -1,5 +1,5 @@
 ---
-title: 'Lab 2: Communities - Cluster'
+title: "Lab 2 Community"
 author: "Clarissa Boyajian"
 date: "1/30/2022"
 output: 
@@ -13,15 +13,17 @@ output:
 knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
 
 # load R packages
-librarian::shelf(
-  tidyverse, DT, palmerpenguins, skimr, tibble, ggvoronoi, scales, cluster, 
-  vegan, factoextra)
+librarian::shelf(tidyverse, DT, palmerpenguins, skimr, tibble, ggvoronoi, 
+                 scales, cluster, vegan, vegan3d, factoextra, h2o)
 
 # set seed for reproducible results
 set.seed(42)
 ```
 
-# Load and view `penguins` dataset
+
+# Clustering
+
+## Load and view `penguins` dataset
 
 ```{r}
 # load the dataset
@@ -66,7 +68,7 @@ ggplot(penguins,
   legend_pos
 ```
 
-# Cluster `penguins` data using kmeans()
+## Cluster `penguins` data using kmeans()
 
 ```{r}
 # cluster using kmeans
@@ -99,7 +101,7 @@ ggplot(penguins, aes(x = bill_length_mm,
 **Answer**: \
 
 
-# Plot Voronoi diagram of clustered `penguins`
+## Plot Voronoi diagram of clustered `penguins`
 
 ```{r}
 # define bounding box for geom_voronoi()
@@ -146,7 +148,7 @@ ggplot(penguins, aes(x = bill_length_mm,
 ```
 
 
-# Load `dune` dataset
+## Load `dune` dataset
 ```{r}
 # load dune dataset from package vegan
 data("dune")
@@ -156,7 +158,7 @@ if (interactive())
   help(dune)
 ```
 
-# Calculate Ecological Distances on sites
+## Calculate Ecological Distances on sites
 
 ```{r}
 sites <- tribble(
@@ -186,7 +188,7 @@ sites_bray
 **Question**: In your own words, how does Bray Curtis differ from Euclidean distance?
 **Answer**: \
 
-# Agglomerative hierarchical clustering on dune
+## Agglomerative hierarchical clustering on dune
 
 ```{r}
 # Dissimilarity matrix
@@ -206,7 +208,6 @@ hc1 <- hclust(d, method = "complete")
 plot(hc1, cex = 0.6, hang = -1)
 ```
 
-## Questions
 **Question**: Which function comes first, vegdist() or hclust(), and why?
 **Answer**: \
 
@@ -255,7 +256,7 @@ plot(hc3, which.plot = 2)
 **Question**: Of the 4 methods, which is the “best” model in terms of Agglomerative Coefficient?
 **Answer**: \
 
-# Divisive hierarchical clustering on dune
+## Divisive hierarchical clustering on dune
 
 ```{r}
 # compute divisive hierarchical clustering
@@ -269,7 +270,7 @@ hc4$dc
 **Answer**: \
 
 
-# Determining optimal clusters
+## Determining optimal clusters
 
 ```{r}
 # Plot cluster results
@@ -291,7 +292,7 @@ gridExtra::grid.arrange(p1, p2, p3, nrow = 1)
 **Question**: In dendrogram plots, which is the biggest determinant of relatedness between observations: the distance between observations along the labeled axes or the height of their shared connection? \
 **Answer**: 
 
-# Working with dendrograms
+## Working with dendrograms
 
 ```{r}
 # Construct dendorgram for the Ames housing example
@@ -327,13 +328,223 @@ fviz_dend(
 ```
 
 
+# Ordination
+
+```{r}
+# get data
+url <- "https://koalaverse.github.io/homlr/data/my_basket.csv"
+my_basket <- readr::read_csv(url)
+dim(my_basket)
+
+my_basket
+```
 
 
+## Principal Components Analysis (PCA)
+
+```{r}
+h2o.no_progress()  # turn off progress bars for brevity
+h2o.init(max_mem_size = "5g")  # connect to H2O instance
+```
+
+**Question**: Why is the pca_method of “GramSVD” chosen over “GLRM”?\
+**Answer**: \
+**Question**: How many inital principal components are chosen with respect to dimensions of the input data?\
+**Answer**: \
+
+```{r}
+# convert data to h2o object
+my_basket.h2o <- as.h2o(my_basket)
+
+# run PCA
+my_pca <- h2o.prcomp(
+  training_frame = my_basket.h2o,
+  pca_method = "GramSVD",
+  k = ncol(my_basket.h2o), 
+  transform = "STANDARDIZE", 
+  impute_missing = TRUE,
+  max_runtime_secs = 1000)
+my_pca
+```
+
+```{r}
+my_pca@model$eigenvectors %>% 
+  as.data.frame() %>% 
+  mutate(feature = row.names(.)) %>%
+  ggplot(aes(pc1, reorder(feature, pc1))) +
+  geom_point()
+```
+
+**Question**: What category of grocery items contribute most to PC1?\
+**Answer**: \
+
+```{r}
+my_pca@model$eigenvectors %>% 
+  as.data.frame() %>% 
+  mutate(feature = row.names(.)) %>%
+  ggplot(aes(pc1, pc2, label = feature)) +
+  geom_text()
+```
+
+**Question**: What category of grocery items contribute the least to PC1 but positively towards PC2?\
+**Answer**: \
+
+## Eigenvalue criterion
+
+```{r}
+# Compute eigenvalues
+eigen <- my_pca@model$importance["Standard deviation", ] %>%
+  as.vector() %>%
+  .^2
+  
+# Sum of all eigenvalues equals number of variables
+sum(eigen)
+```
+
+**Question**: How many principal components would you include to explain 90% of the total variance?\
+**Answer**: \
 
 
+```{r}
+## [1] 42
+
+# Find PCs where the sum of eigenvalues is greater than or equal to 1
+which(eigen >= 1)
+```
+
+```{r}
+# Extract PVE and CVE
+ve <- data.frame(
+  PC  = my_pca@model$importance %>% seq_along(),
+  PVE = my_pca@model$importance %>% .[2,] %>% unlist(),
+  CVE = my_pca@model$importance %>% .[3,] %>% unlist())
+
+# Plot PVE and CVE
+ve %>%
+  tidyr::gather(metric, variance_explained, -PC) %>%
+  ggplot(aes(PC, variance_explained)) +
+  geom_point() +
+  facet_wrap(~ metric, ncol = 1, scales = "free")
+```
+
+```{r}
+# How many PCs required to explain at least 75% of total variability
+min(which(ve$CVE >= 0.75))
+```
+
+```{r}
+# Screee plot criterion
+data.frame(
+  PC  = my_pca@model$importance %>% seq_along,
+  PVE = my_pca@model$importance %>% .[2,] %>% unlist()) %>%
+  ggplot(aes(PC, PVE, group = 1, label = PC)) +
+  geom_point() +
+  geom_line() +
+  geom_text(nudge_y = -.002)
+```
+
+**Question**: How many principal components to include up to the elbow of the PVE, i.e. the “elbow” before plateau of dimensions explaining the least variance?\
+**Answer**: \
+**Question**: What are a couple of disadvantages to using PCA? \
+**Answer**: \
 
 
+# Non-metric MultiDimensional Scaling (NMDS)
 
+## Unconstrained Ordination on Species
 
+```{r}
+# vegetation and environment in lichen pastures from Vare et al (1995)
+data("varespec") # species
+data("varechem") # chemistry
 
+varespec %>% tibble()
+```
 
+**Question**: What are the dimensions of the varespec data frame and what do rows versus columns represent?\
+**Answer**: \
+
+```{r}
+vare.dis <- vegdist(varespec)
+vare.mds0 <- monoMDS(vare.dis)
+stressplot(vare.mds0)
+```
+
+**Question**: The “stress” in a stressplot represents the difference between the observed inpnut distance versus the fitted ordination distance. How much better is the non-metric (i.e., NMDS) fit versus a linear fit (as with PCA) in terms of \(R^2\)?\
+**Answer**: \
+
+```{r}
+ordiplot(vare.mds0, type = "t")
+```
+
+**Question**: What two sites are most dissimilar based on species composition for the first component MDS1? And two more most dissimilar sites for the second component MDS2?\
+**Answer**: \
+
+```{r}
+vare.mds <- metaMDS(varespec, trace = FALSE)
+vare.mds
+```
+
+```{r}
+plot(vare.mds, type = "t")
+```
+
+**Question**: What is the basic difference between metaMDS and monoMDS()?\
+**Answer**: \
+
+## Overlay with Environment
+
+```{r}
+ef <- envfit(vare.mds, varechem, permu = 999)
+ef
+```
+
+```{r}
+plot(vare.mds, display = "sites")
+plot(ef, p.max = 0.05)
+```
+
+**Question**: What two soil chemistry elements have the strongest negative relationship with NMDS1 that is based on species composition?\
+**Answer**: \
+
+```{r}
+ef <- envfit(vare.mds ~ Al + Ca, data = varechem)
+plot(vare.mds, display = "sites")
+plot(ef)
+
+tmp <- with(varechem, ordisurf(vare.mds, Al, add = TRUE))
+ordisurf(vare.mds ~ Ca, data=varechem, add = TRUE, col = "green4")
+```
+
+**Question**: Which of the two NMDS axes differentiates Ca the most, i.e. has the highest value given by the contours at the end (and not middle) of the axis?\
+**Answer**: \
+
+## Constrained Ordination on Species and Environment
+
+```{r}
+# ordinate on species constrained by three soil elements
+vare.cca <- cca(varespec ~ Al + P + K, varechem)
+vare.cca
+```
+
+```{r}
+# plot ordination
+plot(vare.cca)
+```
+
+**Question**: What is the difference between “constrained” versus “unconstrained” ordination within ecological context?\
+**Answer**: \
+
+```{r}
+# plot 3 dimensions
+ordiplot3d(vare.cca, type = "h")
+```
+
+```{r}
+if (interactive()){
+  ordirgl(vare.cca)
+}
+```
+
+**Question**: What sites are most differentiated by CCA1, i.e. furthest apart along its axis, based on species composition AND the environmnent? What is the strongest environmental vector for CCA1, i.e. longest environmental vector in the direction of the CCA1 axes?\
+**Answer**: \
