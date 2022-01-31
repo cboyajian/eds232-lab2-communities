@@ -10,7 +10,7 @@ output:
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
 
 # load R packages
 librarian::shelf(tidyverse, h2o, vegan, vegan3d)
@@ -28,12 +28,17 @@ my_basket
 
 # Ordination
 
-## Performing PCA in R
+## Principal Components Analysis (PCA)
 
 ```{r}
 h2o.no_progress()  # turn off progress bars for brevity
 h2o.init(max_mem_size = "5g")  # connect to H2O instance
 ```
+
+**Question**: Why is the pca_method of “GramSVD” chosen over “GLRM”?\
+**Answer**: \
+**Question**: How many inital principal components are chosen with respect to dimensions of the input data?\
+**Answer**: \
 
 ```{r}
 # convert data to h2o object
@@ -58,6 +63,9 @@ my_pca@model$eigenvectors %>%
   geom_point()
 ```
 
+**Question**: What category of grocery items contribute most to PC1?\
+**Answer**: \
+
 ```{r}
 my_pca@model$eigenvectors %>% 
   as.data.frame() %>% 
@@ -65,6 +73,9 @@ my_pca@model$eigenvectors %>%
   ggplot(aes(pc1, pc2, label = feature)) +
   geom_text()
 ```
+
+**Question**: What category of grocery items contribute the least to PC1 but positively towards PC2?\
+**Answer**: \
 
 ## Eigenvalue criterion
 
@@ -77,6 +88,10 @@ eigen <- my_pca@model$importance["Standard deviation", ] %>%
 # Sum of all eigenvalues equals number of variables
 sum(eigen)
 ```
+
+**Question**: How many principal components would you include to explain 90% of the total variance?\
+**Answer**: \
+
 
 ```{r}
 ## [1] 42
@@ -116,6 +131,12 @@ data.frame(
   geom_text(nudge_y = -.002)
 ```
 
+**Question**: How many principal components to include up to the elbow of the PVE, i.e. the “elbow” before plateau of dimensions explaining the least variance?\
+**Answer**: \
+**Question**: What are a couple of disadvantages to using PCA? \
+**Answer**: \
+
+
 # Non-metric MultiDimensional Scaling (NMDS)
 
 ## Unconstrained Ordination on Species
@@ -128,15 +149,24 @@ data("varechem") # chemistry
 varespec %>% tibble()
 ```
 
+**Question**: What are the dimensions of the varespec data frame and what do rows versus columns represent?\
+**Answer**: \
+
 ```{r}
 vare.dis <- vegdist(varespec)
 vare.mds0 <- monoMDS(vare.dis)
 stressplot(vare.mds0)
 ```
 
+**Question**: The “stress” in a stressplot represents the difference between the observed inpnut distance versus the fitted ordination distance. How much better is the non-metric (i.e., NMDS) fit versus a linear fit (as with PCA) in terms of \(R^2\)?\
+**Answer**: \
+
 ```{r}
 ordiplot(vare.mds0, type = "t")
 ```
+
+**Question**: What two sites are most dissimilar based on species composition for the first component MDS1? And two more most dissimilar sites for the second component MDS2?\
+**Answer**: \
 
 ```{r}
 vare.mds <- metaMDS(varespec, trace = FALSE)
@@ -146,6 +176,9 @@ vare.mds
 ```{r}
 plot(vare.mds, type = "t")
 ```
+
+**Question**: What is the basic difference between metaMDS and monoMDS()?\
+**Answer**: \
 
 ## Overlay with Environment
 
@@ -159,6 +192,9 @@ plot(vare.mds, display = "sites")
 plot(ef, p.max = 0.05)
 ```
 
+**Question**: What two soil chemistry elements have the strongest negative relationship with NMDS1 that is based on species composition?\
+**Answer**: \
+
 ```{r}
 ef <- envfit(vare.mds ~ Al + Ca, data = varechem)
 plot(vare.mds, display = "sites")
@@ -167,6 +203,9 @@ plot(ef)
 tmp <- with(varechem, ordisurf(vare.mds, Al, add = TRUE))
 ordisurf(vare.mds ~ Ca, data=varechem, add = TRUE, col = "green4")
 ```
+
+**Question**: Which of the two NMDS axes differentiates Ca the most, i.e. has the highest value given by the contours at the end (and not middle) of the axis?\
+**Answer**: \
 
 ## Constrained Ordination on Species and Environment
 
@@ -181,6 +220,9 @@ vare.cca
 plot(vare.cca)
 ```
 
+**Question**: What is the difference between “constrained” versus “unconstrained” ordination within ecological context?\
+**Answer**: \
+
 ```{r}
 # plot 3 dimensions
 ordiplot3d(vare.cca, type = "h")
@@ -192,3 +234,5 @@ if (interactive()){
 }
 ```
 
+**Question**: What sites are most differentiated by CCA1, i.e. furthest apart along its axis, based on species composition AND the environmnent? What is the strongest environmental vector for CCA1, i.e. longest environmental vector in the direction of the CCA1 axes?\
+**Answer**: \

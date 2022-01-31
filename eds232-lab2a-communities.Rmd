@@ -10,7 +10,7 @@ output:
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
 
 # load R packages
 librarian::shelf(
@@ -95,7 +95,6 @@ ggplot(penguins, aes(x = bill_length_mm,
   legend_pos
 ```
 
-## Question
 **Question**: Comparing the observed species plot with 3 species with the kmeans() cluster plot with 3 clusters, where does this “unsupervised” kmeans() technique (that does not use species to “fit” the model) produce similar versus different results? One or two sentences would suffice. Feel free to mention ranges of values along the axes.\
 **Answer**: \
 
@@ -184,7 +183,6 @@ sites_bray <- vegdist(sites, method="bray")
 sites_bray
 ```
 
-## Question
 **Question**: In your own words, how does Bray Curtis differ from Euclidean distance?
 **Answer**: \
 
@@ -252,7 +250,6 @@ hc3$ac
 plot(hc3, which.plot = 2)
 ```
 
-## Questions
 **Question**: Which function comes first, vegdist() or hclust(), and why?
 **Answer**: \
 **Question**: Of the 4 methods, which is the “best” model in terms of Agglomerative Coefficient?
@@ -268,7 +265,6 @@ hc4 <- diana(dune)
 hc4$dc
 ```
 
-## Questions
 **Question**: In your own words how does agnes() differ from diana()?
 **Answer**: \
 
@@ -290,7 +286,6 @@ p3 <- fviz_nbclust(dune, FUN = hcut, method = "gap_stat", k.max = 10) +
 gridExtra::grid.arrange(p1, p2, p3, nrow = 1)
 ```
 
-## Questions
 **Question**: How do the optimal number of clusters compare between methods for those with a dashed line?
 **Answer**: \
 **Question**: In dendrogram plots, which is the biggest determinant of relatedness between observations: the distance between observations along the labeled axes or the height of their shared connection? \
