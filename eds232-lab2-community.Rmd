@@ -98,8 +98,8 @@ ggplot(penguins, aes(x = bill_length_mm,
 ```
 
 **Question**: Comparing the observed species plot with 3 species with the kmeans() cluster plot with 3 clusters, where does this “unsupervised” kmeans() technique (that does not use species to “fit” the model) produce similar versus different results? One or two sentences would suffice. Feel free to mention ranges of values along the axes.\
-**Answer**: \
-
+**Answer**: The observed species plot has 3 species that are generally split along diagonal lines, while the cluster plot has 3 clusters that are split along vertical lines. This means that the Adelie species bewteen ~45-55 along the x-axis and above ~17.5 along the y-axis are part of cluster 3.   \
+FINISH
 
 ## Plot Voronoi diagram of clustered `penguins`
 
@@ -171,28 +171,28 @@ sites
 ```
 
 ```{r}
-sites_manhattan <- vegdist(sites, method="manhattan")
+sites_manhattan <- vegdist(sites, method = "manhattan") # sums all differences between prediciton and actual points (the shorter sum is the better predictor line)
 sites_manhattan
 ```
 
 ```{r}
-sites_euclidean <- vegdist(sites, method="euclidean")
+sites_euclidean <- vegdist(sites, method = "euclidean")
 sites_euclidean
 ```
 
 ```{r}
-sites_bray <- vegdist(sites, method="bray")
+sites_bray <- vegdist(sites, method = "bray")
 sites_bray
 ```
 
-**Question**: In your own words, how does Bray Curtis differ from Euclidean distance?
-**Answer**: \
+**Question**: In your own words, how does Bray Curtis differ from Euclidean distance?\
+**Answer**: Bray Curtis distance restricts the outputs between 0 and 1, with 0 being the most similar and 1 being the least similar. Whereas Euclidean distance is not restricted, making the outputs more impacted by abundance of species our outliers.\
 
 ## Agglomerative hierarchical clustering on dune
 
 ```{r}
 # Dissimilarity matrix
-d <- vegdist(dune, method="bray")
+d <- vegdist(dune, method = "bray")
 dim(d)
 ```
 
@@ -208,8 +208,8 @@ hc1 <- hclust(d, method = "complete")
 plot(hc1, cex = 0.6, hang = -1)
 ```
 
-**Question**: Which function comes first, vegdist() or hclust(), and why?
-**Answer**: \
+**Question**: Which function comes first, vegdist() or hclust(), and why?\
+**Answer**: The function `vegdist()` comes before `hclust()` because you need to measure the distances (or dissimilarity values) first. You then use these values in order to create the clusters which become the dendrogram. \
 
 ```{r}
 # Compute agglomerative clustering with agnes
@@ -226,7 +226,7 @@ plot(hc2, which.plot = 2)
 
 ```{r}
 # methods to assess
-m <- c( "average", "single", "complete", "ward")
+m <- c("average", "single", "complete", "ward")
 names(m) <- c( "average", "single", "complete", "ward")
 
 # function to compute coefficient
@@ -251,10 +251,10 @@ hc3$ac
 plot(hc3, which.plot = 2)
 ```
 
-**Question**: Which function comes first, vegdist() or hclust(), and why?
-**Answer**: \
-**Question**: Of the 4 methods, which is the “best” model in terms of Agglomerative Coefficient?
-**Answer**: \
+**Question**: In your own words how does hclust() differ from agnes()?\
+**Answer**: The `agnes()` and `hclust()` functions are very similar in many ways. Both perform hierarchical cluster analysis starting with each observation as its own object and working up the tree. The main difference is that `agnes()` also gives the Agglomerative Coefficient (AC). The AC is useful in describing the strength of the clustering structure.\
+**Question**: Of the 4 methods, which is the “best” model in terms of Agglomerative Coefficient?\
+**Answer**: The ward method creates the best model because it creates a model with the highest Agglomerative Coefficient (aka strongest clustering structure).\
 
 ## Divisive hierarchical clustering on dune
 
@@ -266,8 +266,8 @@ hc4 <- diana(dune)
 hc4$dc
 ```
 
-**Question**: In your own words how does agnes() differ from diana()?
-**Answer**: \
+**Question**: In your own words how does agnes() differ from diana()?\
+**Answer**: The `agnes()` function is an agglomerative method, whereas the `diana()` function is a a divisive hierarchical method. This means that the dendrogram is created from the top down (creating clusters based on dissimilarities), rather than created from the bottom up (creating clusters based on similarity).\
 
 
 ## Determining optimal clusters
@@ -287,10 +287,10 @@ p3 <- fviz_nbclust(dune, FUN = hcut, method = "gap_stat", k.max = 10) +
 gridExtra::grid.arrange(p1, p2, p3, nrow = 1)
 ```
 
-**Question**: How do the optimal number of clusters compare between methods for those with a dashed line?
-**Answer**: \
-**Question**: In dendrogram plots, which is the biggest determinant of relatedness between observations: the distance between observations along the labeled axes or the height of their shared connection? \
-**Answer**: 
+**Question**: How do the optimal number of clusters compare between methods for those with a dashed line?\
+**Answer**: According to the Silhouette method the optimal number of clusters is 4. According to the Gap statistic method, the optimal number of clusters is 3. Because these numbers are similar, there isn't a clear specific answer but 3-4 clusters would be good.\
+**Question**: In dendrogram plots, which is the biggest determinant of relatedness between observations: the distance between observations along the labeled axes or the height of their shared connection?\
+**Answer**: The height of their shared connection is the biggest determinant of relatedness, because the height is the measure of distance between observations and clusters of observations. The distance on the labeled axes has no connection to measured distance, but rather shows which observations are clustered together. 
 
 ## Working with dendrograms
 
@@ -339,18 +339,12 @@ dim(my_basket)
 my_basket
 ```
 
-
 ## Principal Components Analysis (PCA)
 
 ```{r}
 h2o.no_progress()  # turn off progress bars for brevity
 h2o.init(max_mem_size = "5g")  # connect to H2O instance
 ```
-
-**Question**: Why is the pca_method of “GramSVD” chosen over “GLRM”?\
-**Answer**: \
-**Question**: How many inital principal components are chosen with respect to dimensions of the input data?\
-**Answer**: \
 
 ```{r}
 # convert data to h2o object
@@ -367,6 +361,11 @@ my_pca <- h2o.prcomp(
 my_pca
 ```
 
+**Question**: Why is the pca_method of “GramSVD” chosen over “GLRM”?\
+**Answer**: The "GramSVD" method is used for data that is mostly composed of numeric variables, while the "GLRM" method is used for data composed of mostly categorical variables.\
+**Question**: How many initial principal components are chosen with respect to dimensions of the input data?\
+**Answer**: There are 42 initial principal components, which matches the number of features (aka the dimensions of the input data).\
+
 ```{r}
 my_pca@model$eigenvectors %>% 
   as.data.frame() %>% 
@@ -376,7 +375,7 @@ my_pca@model$eigenvectors %>%
 ```
 
 **Question**: What category of grocery items contribute most to PC1?\
-**Answer**: \
+**Answer**: The Bulmers cider contributes the most to PC1.\
 
 ```{r}
 my_pca@model$eigenvectors %>% 
@@ -387,7 +386,7 @@ my_pca@model$eigenvectors %>%
 ```
 
 **Question**: What category of grocery items contribute the least to PC1 but positively towards PC2?\
-**Answer**: \
+**Answer**: Carrots contributes the least to PC but positively towards PC2.\
 
 ## Eigenvalue criterion
 
@@ -400,10 +399,6 @@ eigen <- my_pca@model$importance["Standard deviation", ] %>%
 # Sum of all eigenvalues equals number of variables
 sum(eigen)
 ```
-
-**Question**: How many principal components would you include to explain 90% of the total variance?\
-**Answer**: \
-
 
 ```{r}
 ## [1] 42
@@ -424,8 +419,12 @@ ve %>%
   tidyr::gather(metric, variance_explained, -PC) %>%
   ggplot(aes(PC, variance_explained)) +
   geom_point() +
-  facet_wrap(~ metric, ncol = 1, scales = "free")
+  facet_wrap(~ metric, ncol = 1, scales = "free") #+
+  #geom_hline(yintercept = 0.9)
 ```
+
+**Question**: How many principal components would you include to explain 90% of the total variance?\
+**Answer**: I would include 36 principal components to explain 90% of the total variance.\
 
 ```{r}
 # How many PCs required to explain at least 75% of total variability
@@ -444,9 +443,9 @@ data.frame(
 ```
 
 **Question**: How many principal components to include up to the elbow of the PVE, i.e. the “elbow” before plateau of dimensions explaining the least variance?\
-**Answer**: \
+**Answer**: I would include 8 principal components, this is the last component before the "elbow" starts.\
 **Question**: What are a couple of disadvantages to using PCA? \
-**Answer**: \
+**Answer**: PCA is highly impacted by outliers and does not work well for non-linear patterns.\
 
 
 # Non-metric MultiDimensional Scaling (NMDS)
@@ -462,7 +461,7 @@ varespec %>% tibble()
 ```
 
 **Question**: What are the dimensions of the varespec data frame and what do rows versus columns represent?\
-**Answer**: \
+**Answer**: The columns in the varespec data frame represent 44 different species. The rows represent 24 different sites, with the values in each cell representing an estimated cover value for each species at each site. \
 
 ```{r}
 vare.dis <- vegdist(varespec)
@@ -470,15 +469,15 @@ vare.mds0 <- monoMDS(vare.dis)
 stressplot(vare.mds0)
 ```
 
-**Question**: The “stress” in a stressplot represents the difference between the observed inpnut distance versus the fitted ordination distance. How much better is the non-metric (i.e., NMDS) fit versus a linear fit (as with PCA) in terms of \(R^2\)?\
-**Answer**: \
+**Question**: The “stress” in a stressplot represents the difference between the observed input distance versus the fitted ordination distance. How much better is the non-metric (i.e., NMDS) fit versus a linear fit (as with PCA) in terms of \(R^2\)?\
+**Answer**: The non-metric fit is better than the linear fit by a difference of 0.104 in the \(R^2\) value.\
 
 ```{r}
 ordiplot(vare.mds0, type = "t")
 ```
 
 **Question**: What two sites are most dissimilar based on species composition for the first component MDS1? And two more most dissimilar sites for the second component MDS2?\
-**Answer**: \
+**Answer**: The two sites that are most dissimilar based on species composition for the first component MDS1 are sites 28 and 4 or 5. The two most dissimilar sites for hte second component MDS2 are 21 and 5.\
 
 ```{r}
 vare.mds <- metaMDS(varespec, trace = FALSE)
@@ -490,7 +489,7 @@ plot(vare.mds, type = "t")
 ```
 
 **Question**: What is the basic difference between metaMDS and monoMDS()?\
-**Answer**: \
+**Answer**: `metaMDS()` uses `monoMDS()` to create a nonlinear regression from multiple different random starts.\
 
 ## Overlay with Environment
 
@@ -505,7 +504,7 @@ plot(ef, p.max = 0.05)
 ```
 
 **Question**: What two soil chemistry elements have the strongest negative relationship with NMDS1 that is based on species composition?\
-**Answer**: \
+**Answer**: Aluminium (Al) and Iron (Fe) have the strongest negative relationship with NMDS1.\
 
 ```{r}
 ef <- envfit(vare.mds ~ Al + Ca, data = varechem)
@@ -513,7 +512,7 @@ plot(vare.mds, display = "sites")
 plot(ef)
 
 tmp <- with(varechem, ordisurf(vare.mds, Al, add = TRUE))
-ordisurf(vare.mds ~ Ca, data=varechem, add = TRUE, col = "green4")
+ordisurf(vare.mds ~ Ca, data = varechem, add = TRUE, col = "green4")
 ```
 
 **Question**: Which of the two NMDS axes differentiates Ca the most, i.e. has the highest value given by the contours at the end (and not middle) of the axis?\
