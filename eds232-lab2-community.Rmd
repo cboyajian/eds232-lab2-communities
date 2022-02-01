@@ -526,13 +526,16 @@ vare.cca <- cca(varespec ~ Al + P + K, varechem)
 vare.cca
 ```
 
+**Question**: What is the difference between “constrained” versus “unconstrained” ordination within ecological context?\
+**Answer**: \
+
 ```{r}
 # plot ordination
 plot(vare.cca)
 ```
 
-**Question**: What is the difference between “constrained” versus “unconstrained” ordination within ecological context?\
-**Answer**: \
+**Question**: What sites are most differentiated by CCA1, i.e. furthest apart along its axis, based on species composition AND the environment? What is the strongest environmental vector for CCA1, i.e. longest environmental vector in the direction of the CCA1 axes?\
+**Answer**: 28 and 4, Al\
 
 ```{r}
 # plot 3 dimensions
@@ -545,5 +548,3 @@ if (interactive()){
 }
 ```
 
-**Question**: What sites are most differentiated by CCA1, i.e. furthest apart along its axis, based on species composition AND the environmnent? What is the strongest environmental vector for CCA1, i.e. longest environmental vector in the direction of the CCA1 axes?\
-**Answer**: \
