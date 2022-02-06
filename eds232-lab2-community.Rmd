@@ -68,7 +68,7 @@ ggplot(penguins,
   legend_pos
 ```
 
-## Cluster `penguins` data using kmeans()
+## Cluster `penguins` data using `kmeans()`
 
 ```{r}
 # cluster using kmeans
@@ -97,9 +97,8 @@ ggplot(penguins, aes(x = bill_length_mm,
   legend_pos
 ```
 
-**Question**: Comparing the observed species plot with 3 species with the kmeans() cluster plot with 3 clusters, where does this “unsupervised” kmeans() technique (that does not use species to “fit” the model) produce similar versus different results? One or two sentences would suffice. Feel free to mention ranges of values along the axes.\
-**Answer**: The observed species plot has 3 species that are generally split along diagonal lines, while the cluster plot has 3 clusters that are split along vertical lines. This means that the Adelie species bewteen ~45-55 along the x-axis and above ~17.5 along the y-axis are part of cluster 3.   \
-FINISH
+**Question**: Comparing the observed species plot with 3 species with the `kmeans()` cluster plot with 3 clusters, where does this “unsupervised” `kmeans()` technique (that does not use species to “fit” the model) produce similar versus different results? One or two sentences would suffice. Feel free to mention ranges of values along the axes.\
+**Answer**: The observed species plot has 3 species that are generally split along diagonal lines (going from the bottom left to the top right), while the cluster plot has 3 clusters that are split along vertical lines. Cluster 1 is all observations below ~42 on the x-axis and above 15 on the y-axis, cluster 2 is all observations between ~42 and ~48 on the x-axis, and cluster 3 is all observations above ~48 on the x-axis. This means that the Adelie species between ~45-55 on the x-axis and above ~17.5 on the y-axis are in cluster 3 instead of cluster 2, the Chinstrap species above ~47 on the x-axis and above ~17.5 on the y-axis are in cluster 1 instead of cluster 3, and the Gentoo species below ~ 48 on the x-axis and ~16 on the y-axis are in cluster 3 instead of cluster 1.\
 
 ## Plot Voronoi diagram of clustered `penguins`
 
@@ -171,7 +170,7 @@ sites
 ```
 
 ```{r}
-sites_manhattan <- vegdist(sites, method = "manhattan") # sums all differences between prediciton and actual points (the shorter sum is the better predictor line)
+sites_manhattan <- vegdist(sites, method = "manhattan") # sums all differences between prediction and actual points (the shorter sum is the better predictor line)
 sites_manhattan
 ```
 
@@ -186,7 +185,7 @@ sites_bray
 ```
 
 **Question**: In your own words, how does Bray Curtis differ from Euclidean distance?\
-**Answer**: Bray Curtis distance restricts the outputs between 0 and 1, with 0 being the most similar and 1 being the least similar. Whereas Euclidean distance is not restricted, making the outputs more impacted by abundance of species our outliers.\
+**Answer**: Bray Curtis distance restricts the outputs between 0 and 1, with 0 being the most similar and 1 being the least similar. Whereas Euclidean distance is not restricted, making the outputs more impacted by abundance of species or outliers.\
 
 ## Agglomerative hierarchical clustering on dune
 
@@ -209,7 +208,7 @@ plot(hc1, cex = 0.6, hang = -1)
 ```
 
 **Question**: Which function comes first, vegdist() or hclust(), and why?\
-**Answer**: The function `vegdist()` comes before `hclust()` because you need to measure the distances (or dissimilarity values) first. You then use these values in order to create the clusters which become the dendrogram. \
+**Answer**: The function `vegdist()` comes before `hclust()` because you need to measure the distances (or dissimilarity values) first. You then use these values in order to create the clusters which become the dendrogram.\
 
 ```{r}
 # Compute agglomerative clustering with agnes
@@ -251,10 +250,10 @@ hc3$ac
 plot(hc3, which.plot = 2)
 ```
 
-**Question**: In your own words how does hclust() differ from agnes()?\
+**Question**: In your own words how does `hclust()` differ from `agnes()`?\
 **Answer**: The `agnes()` and `hclust()` functions are very similar in many ways. Both perform hierarchical cluster analysis starting with each observation as its own object and working up the tree. The main difference is that `agnes()` also gives the Agglomerative Coefficient (AC). The AC is useful in describing the strength of the clustering structure.\
 **Question**: Of the 4 methods, which is the “best” model in terms of Agglomerative Coefficient?\
-**Answer**: The ward method creates the best model because it creates a model with the highest Agglomerative Coefficient (aka strongest clustering structure).\
+**Answer**: The Ward method creates the best model because it creates a model with the highest Agglomerative Coefficient (aka strongest clustering structure).\
 
 ## Divisive hierarchical clustering on dune
 
@@ -266,7 +265,7 @@ hc4 <- diana(dune)
 hc4$dc
 ```
 
-**Question**: In your own words how does agnes() differ from diana()?\
+**Question**: In your own words how does `agnes()` differ from `diana()`?\
 **Answer**: The `agnes()` function is an agglomerative method, whereas the `diana()` function is a a divisive hierarchical method. This means that the dendrogram is created from the top down (creating clusters based on dissimilarities), rather than created from the bottom up (creating clusters based on similarity).\
 
 
@@ -288,9 +287,9 @@ gridExtra::grid.arrange(p1, p2, p3, nrow = 1)
 ```
 
 **Question**: How do the optimal number of clusters compare between methods for those with a dashed line?\
-**Answer**: According to the Silhouette method the optimal number of clusters is 4. According to the Gap statistic method, the optimal number of clusters is 3. Because these numbers are similar, there isn't a clear specific answer but 3-4 clusters would be good.\
+**Answer**: According to the Silhouette method the optimal number of clusters is 4. According to the Gap statistic method, the optimal number of clusters is 3. Because these numbers are close there isn't a clear specific answer, but 3-4 clusters would be good.\
 **Question**: In dendrogram plots, which is the biggest determinant of relatedness between observations: the distance between observations along the labeled axes or the height of their shared connection?\
-**Answer**: The height of their shared connection is the biggest determinant of relatedness, because the height is the measure of distance between observations and clusters of observations. The distance on the labeled axes has no connection to measured distance, but rather shows which observations are clustered together. 
+**Answer**: The height of their shared connection is the biggest determinant of relatedness, because the height shows when clusters were formed and therefore measures the distance between observations and clusters of observations.
 
 ## Working with dendrograms
 
@@ -460,8 +459,8 @@ data("varechem") # chemistry
 varespec %>% tibble()
 ```
 
-**Question**: What are the dimensions of the varespec data frame and what do rows versus columns represent?\
-**Answer**: The columns in the varespec data frame represent 44 different species. The rows represent 24 different sites, with the values in each cell representing an estimated cover value for each species at each site. \
+**Question**: What are the dimensions of the `varespec` data frame and what do rows versus columns represent?\
+**Answer**: The columns in the `varespec` data represent 44 different species. The rows represent 24 different sites, with the values in each cell representing an estimated cover value for each species at each site. \
 
 ```{r}
 vare.dis <- vegdist(varespec)
@@ -477,7 +476,7 @@ ordiplot(vare.mds0, type = "t")
 ```
 
 **Question**: What two sites are most dissimilar based on species composition for the first component MDS1? And two more most dissimilar sites for the second component MDS2?\
-**Answer**: The two sites that are most dissimilar based on species composition for the first component MDS1 are sites 28 and 4 or 5. The two most dissimilar sites for hte second component MDS2 are 21 and 5.\
+**Answer**: The two sites that are most dissimilar based on species composition for the first component MDS1 are sites 28 and 5. The two most dissimilar sites for the second component MDS2 are 21 and 5.\
 
 ```{r}
 vare.mds <- metaMDS(varespec, trace = FALSE)
@@ -488,8 +487,8 @@ vare.mds
 plot(vare.mds, type = "t")
 ```
 
-**Question**: What is the basic difference between metaMDS and monoMDS()?\
-**Answer**: `metaMDS()` uses `monoMDS()` to create a nonlinear regression from multiple different random starts.\
+**Question**: What is the basic difference between `metaMDS()` and `monoMDS()`?\
+**Answer**: `metaMDS()` uses `monoMDS()` multiple times to create a nonlinear regression from multiple different random starts.\
 
 ## Overlay with Environment
 
@@ -516,7 +515,7 @@ ordisurf(vare.mds ~ Ca, data = varechem, add = TRUE, col = "green4")
 ```
 
 **Question**: Which of the two NMDS axes differentiates Ca the most, i.e. has the highest value given by the contours at the end (and not middle) of the axis?\
-**Answer**: \
+**Answer**: The x-axis differentiates Ca the most.\
 
 ## Constrained Ordination on Species and Environment
 
@@ -527,7 +526,7 @@ vare.cca
 ```
 
 **Question**: What is the difference between “constrained” versus “unconstrained” ordination within ecological context?\
-**Answer**: \
+**Answer**: Constrained ordination includes two or more sets of environmental data and examines the relationship between the different variables. So it is good for testing hypothesis. Unconstrained ordination assume no structure to the dataset and is useful for viewing overall patterns in the dataset.\
 
 ```{r}
 # plot ordination
@@ -535,7 +534,7 @@ plot(vare.cca)
 ```
 
 **Question**: What sites are most differentiated by CCA1, i.e. furthest apart along its axis, based on species composition AND the environment? What is the strongest environmental vector for CCA1, i.e. longest environmental vector in the direction of the CCA1 axes?\
-**Answer**: 28 and 4, Al\
+**Answer**: Sites 28 and 4 are farthest apart along the x-axis and therefore most differentiated by CCA1. The longest environmental vector is Al (Aluminium).\
 
 ```{r}
 # plot 3 dimensions
